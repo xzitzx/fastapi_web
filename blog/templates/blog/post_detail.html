@@ -1,0 +1,62 @@
+{% extends 'blog/base.html' %}
+{% load blog_extras %}  {% block content %}
+    <article class="blog-post">
+        <h1 class="mb-3">{{ post.title }}</h1>
+        <p class="text-muted border-bottom pb-3">
+            {{ post.created_at|date:"Y年m月d日" }} by <strong>{{ post.author }}</strong>
+        </p>
+
+        {% if post.cover %}
+            <img src="{{ post.cover.url }}" class="img-fluid rounded mb-4" alt="{{ post.title }}">
+        {% endif %}
+
+        <div class="blog-post-body lh-lg">
+            {{ post.body|to_markdown }}
+        </div>
+    </article>
+
+    <div class="mt-5 mb-5">
+        <a href="{% url 'blog:post_list' %}" class="btn btn-outline-secondary">&larr; 返回列表</a>
+    </div>
+    <hr class="my-5">
+
+    <h4 class="mb-4">评论 ({{ post.comments.count }})</h4>
+    <div class="mb-5">
+        {% for comment in post.comments.all %}
+            <div class="card mb-3 border-0 bg-light">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted">
+                        <strong>{{ comment.name }}</strong>
+                        <span class="small"> - {{ comment.created_at|date:"Y-m-d H:i" }}</span>
+                    </h6>
+                    <p class="card-text">{{ comment.body|linebreaks }}</p>
+                </div>
+            </div>
+        {% empty %}
+            <p class="text-muted">暂无评论，快来抢沙发吧！</p>
+        {% endfor %}
+    </div>
+
+    <h4 class="mb-3">发表评论</h4>
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label">昵称</label>
+                    {% if user.is_authenticated %}
+                        <input type="text" name="name" class="form-control" value="{{ user.username }}" readonly>
+                    {% else %}
+                        {{ form.name }}
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">内容</label>
+                    {{ form.body }}
+                </div>
+                <button type="submit" class="btn btn-primary">提交评论</button>
+            </form>
+        </div>
+    </div>
+    <br><br> ```
+{% endblock %}

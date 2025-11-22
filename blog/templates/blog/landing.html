@@ -1,0 +1,78 @@
+{% load static %} <!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>欢迎来到我的世界</title>
+    <style>
+        /* 1. 清除默认边距，占满屏幕 */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden; /* 禁止滚动条 */
+            background-color: #000;
+        }
+
+        /* 2. 全屏链接容器 */
+        .full-screen-link {
+            display: block;
+            width: 100%;
+            height: 100%;
+            text-decoration: none; /* 去掉下划线 */
+            position: relative; /* 作为绝对定位子元素的参考基准 */
+        }
+
+        /* === 3. 核心：背景视频样式 === */
+        #bg-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* object-fit: cover 是让视频像背景图一样裁切填充的关键属性 */
+            object-fit: cover;
+            z-index: 1; /* 放在最底层 */
+        }
+
+        /* 4. 中间文字层 */
+        .content {
+            position: relative;
+            z-index: 2; /* 放在视频上面 */
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.7);
+            /* 加一层薄薄的黑罩，防止视频太亮看不清文字 */
+            background: rgba(0, 0, 0, 0.4);
+            transition: background 0.3s;
+        }
+
+        /* 鼠标悬停时，黑罩变深一点，提示可以点击 */
+        .full-screen-link:hover .content {
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        h1 { font-size: 3rem; letter-spacing: 5px; margin-bottom: 1rem; }
+        p { font-size: 1.2rem; letter-spacing: 2px; text-transform: uppercase; }
+
+    </style>
+</head>
+<body>
+    <a href="{% url 'blog:post_list' %}" class="full-screen-link">
+
+        <video autoplay muted loop playsinline id="bg-video">
+            <source src="{% static 'blog/videos/VID_20250731_031214_786.mp4' %}" type="video/mp4">
+            您的浏览器不支持 HTML5 视频。
+        </video>
+
+        <div class="content">
+            <h1>WELCOME</h1>
+            <p>点击进入我的博客</p>
+        </div>
+    </a>
+</body>
+</html>

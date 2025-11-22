@@ -1,0 +1,26 @@
+{% extends 'blog/base.html' %}
+
+{% block content %}
+<div class="card shadow-sm">
+    <div class="card-header bg-success text-white">注册新用户</div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="mb-3">
+                    <label class="form-label">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}
+                        <small class="form-text text-muted">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% for error in field.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-success w-100">注册</button>
+        </form>
+    </div>
+</div>
+<style> input { display: block; width: 100%; padding: .375rem .75rem; border: 1px solid #ced4da; border-radius: .25rem; } ul {padding-left: 20px;} </style>
+{% endblock %}
