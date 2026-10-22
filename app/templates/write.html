@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}写文章{% endblock %}
+
+{# 预览区显示代码高亮 #}
+{% block styles %}<link rel="stylesheet" href="/static/css/code.css">{% endblock %}
+
+{% block body_class %}write-page{% endblock %}
+
+{% block content %}
+<form class="write-form" method="post" enctype="multipart/form-data">
+  {% if errors %}
+  <div class="write-errors">
+    {% for error in errors %}
+    <p class="form-error" role="alert">{{ error }}</p>
+    {% endfor %}
+  </div>
+  {% endif %}
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+  <div class="write-field">
+    <label for="post-title">标题</label>
+    <input id="post-title" class="write-title" name="title" type="text" maxlength="200" value="{{ title }}" required>
+  </div>
+
+  <div class="write-field">
+    <label for="post-cover">封面图（可选）</label>
+    {% if post and post.cover %}
+    <img class="write-cover" src="/media/{{ post.cover }}" alt="">
+    <label class="write-check"><input type="checkbox" name="remove_cover" value="1"{% if remove_cover %} checked{% endif %}>移除封面</label>
+    {% endif %}
+    <input id="post-cover" class="write-file" name="cover" type="file" accept="image/jpeg,image/png,image/gif,image/webp" aria-describedby="cover-hint">
+    <span id="cover-hint" class="write-hint">JPG、PNG、GIF、WebP，不超过 10MB</span>
+  </div>
+
+  <div class="editor">
+    <div class="editor-bar">
+      <div class="editor-modes" role="group" aria-label="切换编辑和预览">
+        <button type="button" data-mode="edit" aria-pressed="true">编辑</button>
+        <button type="button" data-mode="preview" aria-pressed="false">预览</button>
+      </div>
+      <button type="button" id="insert-image" class="insert-image">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"></rect><circle cx="9" cy="10" r="1.5"></circle><path d="M21 16l-5-5-9 9"></path></svg>
+        插入图片
+      </button>
+      <input type="file" id="image-file" accept="image/jpeg,image/png,image/gif,image/webp" hidden>
+    </div>
+    <p id="editor-message" class="editor-message" aria-live="polite"></p>
+    <div class="editor-pane write-field">
+      <label for="post-body">正文</label>
+      {# 解析器会丢弃开始标签后的第一个换行，这里多放一个，正文开头的换行才不会每保存一次少一个 #}
+      <textarea id="post-body" name="body" rows="18" aria-describedby="body-hint">
+{{ body }}</textarea>
+      <span id="body-hint" class="write-hint">支持 Markdown。图片可以点"插入图片"上传，也可以直接粘贴到正文里。</span>
+    </div>
+    <div id="preview" class="prose write-preview" hidden></div>
+  </div>
+
+  <div class="write-actions">
+    {% if post %}
+    <span class="write-status">{% if post.is_published %}已发布{% else %}草稿{% endif %} · 最后保存于 {{ post.updated_at|datetime_local }}</span>
+    {% endif %}
+    <div class="write-buttons">
+      {# 在输入框里按回车时提交第一个按钮，它必须保持文章当前状态 #}
+      {% if post and post.is_published %}
+      <button class="button-primary" type="submit" name="action" value="publish">更新</button>
+      <button class="button" type="submit" name="action" value="draft">转为草稿</button>
+      {% else %}
+      <button class="button" type="submit" name="action" value="draft">保存草稿</button>
+      <button class="button-primary" type="submit" name="action" value="publish">发布</button>
+      {% endif %}
+    </div>
+  </div>
+</form>
+{% endblock %}
+
+{% block scripts %}<script src="/static/js/write.js"></script>{% endblock %}

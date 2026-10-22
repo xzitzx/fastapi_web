@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}登录{% endblock %}
+
+{% block content %}
+<div class="login">
+  <h1>登录</h1>
+  {% if error %}<p class="form-error" role="alert">{{ error }}</p>{% endif %}
+  {# 不写 action：提交到当前地址，保留查询参数 next #}
+  <form class="login-form" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="field">
+      <label for="login-username">用户名</label>
+      <input id="login-username" name="username" type="text" autocomplete="username" value="{{ username }}" required>
+    </div>
+    <div class="field">
+      <label for="login-password">密码</label>
+      <input id="login-password" name="password" type="password" autocomplete="current-password" required>
+    </div>
+    <button class="button-primary" type="submit">登录</button>
+  </form>
+</div>
+{% endblock %}

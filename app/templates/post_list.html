@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}文章{% endblock %}
+
+{% block content %}
+<h1 class="page-title">文章</h1>
+
+{% if drafts %}
+<section class="drafts" aria-labelledby="drafts-title">
+  <h2 id="drafts-title" class="section-title">草稿</h2>
+  <ul class="draft-list">
+    {% for draft in drafts %}
+    <li>
+      <a href="/post/{{ draft.id }}/edit">{{ draft.title }}</a>
+      <span class="meta">最后保存于 {{ draft.updated_at|datetime_local }}</span>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+{% if items %}
+<div class="post-list">
+  {% for item in items %}
+  <article class="post-item">
+    <h2><a href="/post/{{ item.post.id }}/">{{ item.post.title }}</a></h2>
+    <p class="excerpt">{{ item.excerpt }}</p>
+    <p class="meta">{{ item.post.published_at|date }} · 约 {{ item.minutes }} 分钟 · {{ item.comment_count }} 条评论</p>
+  </article>
+  {% endfor %}
+</div>
+<nav class="pager" aria-label="分页">
+  {% if page > 1 %}<a class="pager-prev" href="/blog/?page={{ page - 1 }}">上一页</a>{% endif %}
+  <span class="pager-current">{{ page }} / {{ pages }}</span>
+  {% if page < pages %}<a class="pager-next" href="/blog/?page={{ page + 1 }}">下一页</a>{% endif %}
+</nav>
+{% else %}
+<p class="empty">还没有文章</p>
+{% endif %}
+{% endblock %}

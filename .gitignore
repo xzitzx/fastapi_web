@@ -1,11 +1,10 @@
-# Django
+# Python 与应用数据
 *.log
 *.pot
 *.pyc
 __pycache__/
-db.sqlite3
-media/
-staticfiles/
+/blog.db
+/media/
 
 # Environment variables
 .env
@@ -30,14 +29,6 @@ env/
 .Trashes
 ehthumbs.db
 Thumbs.db
-
-# Database migrations (可选，根据团队规范)
-# */migrations/*.py
-# !*/migrations/__init__.py
-
-# Local settings
-local_settings.py
-settings_local.py
 
 # Logs
 logs/

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}首页{% endblock %}
+
+{% block body_class %}has-hero{% endblock %}
+
+{% block hero %}
+<div class="hero">
+  <video class="hero-video" src="/static/videos/home.mp4" poster="/static/videos/home.jpg" autoplay muted loop playsinline aria-hidden="true"></video>
+  <script>
+    // 系统开启"减少动态效果"时不自动播放
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      const video = document.querySelector(".hero-video");
+      video.removeAttribute("autoplay");
+      video.pause();
+    }
+  </script>
+  <a class="hero-scroll" href="#recent" aria-label="向下滚动到最近文章">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+  </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<section id="recent" class="recent">
+  <h1>最近文章</h1>
+  {% if posts %}
+  <ul class="post-index">
+    {% for post in posts %}
+    <li><a href="/post/{{ post.id }}/"><span class="post-index-date">{{ post.published_at|date }}</span><span class="post-index-title">{{ post.title }}</span></a></li>
+    {% endfor %}
+  </ul>
+  <a class="more-link" href="/blog/">全部文章 →</a>
+  {% else %}
+  <p class="empty">还没有文章</p>
+  {% endif %}
+</section>
+{% endblock %}

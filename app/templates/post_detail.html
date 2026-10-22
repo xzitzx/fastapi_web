@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block styles %}<link rel="stylesheet" href="/static/css/code.css">{% endblock %}
+
+{% block content %}
+<div class="post-top">
+  <a class="back-link" href="/blog/">返回文章列表</a>
+  {% if is_admin %}
+  <div class="post-actions">
+    <a class="button" href="/post/{{ post.id }}/edit">编辑</a>
+    <form method="post" action="/post/{{ post.id }}/delete" onsubmit="return confirm('确定删除这篇文章？')">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="button" type="submit">删除</button>
+    </form>
+  </div>
+  {% endif %}
+</div>
+
+<article class="post">
+  <h1 class="post-title">{{ post.title }}</h1>
+  <p class="post-meta">
+    {% if post.is_published %}{{ post.published_at|date_cn }}{% else %}<span class="badge">草稿</span> · 最后保存于 {{ post.updated_at|datetime_local }}{% endif %} · 约 {{ minutes }} 分钟
+  </p>
+  {% if post.cover %}<img class="post-cover" src="/media/{{ post.cover }}" alt="">{% endif %}
+  <div class="prose">{{ body_html }}</div>
+</article>
+
+{% if post.is_published %}
+<nav class="post-nav" aria-label="上一篇和下一篇">
+  <div class="post-nav-prev">
+    {% if prev_post %}
+    <a href="/post/{{ prev_post.id }}/"><span class="post-nav-label">上一篇</span><span class="post-nav-title">{{ prev_post.title }}</span></a>
+    {% else %}
+    <span class="post-nav-label">上一篇</span><span class="post-nav-title">没有了</span>
+    {% endif %}
+  </div>
+  <div class="post-nav-next">
+    {% if next_post %}
+    <a href="/post/{{ next_post.id }}/"><span class="post-nav-label">下一篇</span><span class="post-nav-title">{{ next_post.title }}</span></a>
+    {% else %}
+    <span class="post-nav-label">下一篇</span><span class="post-nav-title">没有了</span>
+    {% endif %}
+  </div>
+</nav>
+{% endif %}
+
+{# 转为草稿的文章仍列出已有评论，但不能再发表 #}
+{% if post.is_published or comments %}
+<section class="comments" aria-labelledby="comments-title">
+  <h2 id="comments-title" class="section-title">评论 <span class="comments-count">{{ comments|length }}</span></h2>
+  {% if comments %}
+  <ol class="comment-list">
+    {% for comment in comments %}
+    <li class="comment">
+      <div class="comment-head">
+        <span class="comment-name">{{ comment.name }}</span>
+        <span class="comment-time">{{ comment.created_at|datetime_local }}</span>
+        {% if is_admin %}
+        <form class="comment-delete" method="post" action="/comments/{{ comment.id }}/delete" onsubmit="return confirm('确定删除这条评论？')">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit">删除</button>
+        </form>
+        {% endif %}
+      </div>
+      <p class="comment-body">{{ comment.body }}</p>
+    </li>
+    {% endfor %}
+  </ol>
+  {% else %}
+  <p class="empty">还没有评论</p>
+  {% endif %}
+  {% if post.is_published %}
+  {# 锚点让校验失败后重新渲染的页面直接停在表单处 #}
+  <form id="comment-form" class="comment-form" method="post" action="/post/{{ post.id }}/#comment-form">
+    <h3>发表评论</h3>
+    {% for error in errors %}
+    <p class="form-error" role="alert">{{ error }}</p>
+    {% endfor %}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="field">
+      <label for="comment-name">昵称</label>
+      <input id="comment-name" name="name" type="text" maxlength="80" value="{{ comment_name }}" required>
+    </div>
+    <div class="field">
+      <label for="comment-body">内容</label>
+      <textarea id="comment-body" name="body" rows="4" maxlength="2000" required>{{ comment_body }}</textarea>
+    </div>
+    <div><button class="button-primary" type="submit">提交评论</button></div>
+  </form>
+  {% endif %}
+</section>
+{% endif %}
+{% endblock %}
